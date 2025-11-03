@@ -4,6 +4,7 @@ provider "kubernetes" {
   insecure = true
 }
 
+#space added to trigger
 # Simple smoke test ConfigMap
 resource "kubernetes_config_map" "hello" {
   metadata {
