@@ -44,7 +44,8 @@ resource "kubernetes_deployment" "nginx" {
       spec {
         container {
           name  = "nginx"
-          image = "nginx:1.25-alpine"
+          image =  "nginxinc/nginx-unprivileged:1.25-alpine" 
+          image_pull_policy = "IfNotPresent"  # ← ADDED: Prevent pull issues
 
           port {
             container_port = 80
