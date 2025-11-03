@@ -4,7 +4,7 @@ provider "kubernetes" {
   insecure = true
 }
 
-# Simple smoke test ConfigMap
+# Keep the simple ConfigMap test
 resource "kubernetes_config_map" "hello" {
   metadata {
     name      = "hello-from-spacelift"
@@ -51,11 +51,11 @@ resource "kubernetes_deployment" "nginx" {
           }
 
           resources {
-            requests = {
+            requests {
               cpu    = "50m"
               memory = "64Mi"
             }
-            limits = {
+            limits {
               cpu    = "200m"
               memory = "128Mi"
             }
