@@ -10,22 +10,16 @@ variable "k8s_host" {
   description = "External API endpoint (https://0.tcp.in.ngrok.io:<port>). Leave empty for local kubeconfig."
 }
 
-variable "k8s_token" {
+variable "k8s_token_b64" {
   type        = string
   default     = ""
   sensitive   = true
-  description = "Bearer token for the Kubernetes API (used when k8s_host is set)"
+  description = "Base64-encoded bearer token (use when k8s_host is set)"
 }
 
 provider "kubernetes" {
-  host  = var.k8s_host  != "" ? var.k8s_host  : null
-  token = var.k8s_token != "" ? var.k8s_token : null
-
-  insecure = (
-    var.k8s_host != ""
-  ) ? true : null
-
-  config_path = (
-    var.k8s_host == "" && var.kubeconfig_path != ""
-  ) ? var.kubeconfig_path : null
+  host        = var.k8s_host    != "" ? var.k8s_host : null
+  token       = var.k8s_token_b64 != "" ? base64decode(var.k8s_token_b64) : null
+  insecure    = var.k8s_host    != "" ? true : null
+  config_path = (var.k8s_host == "" && var.kubeconfig_path != "") ? var.kubeconfig_path : null
 }
