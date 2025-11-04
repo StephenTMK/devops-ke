@@ -5,7 +5,7 @@ variable "kubeconfig_path" {
 }
 
 variable "k8s_host" {
-  description = "External API endpoint (https://host:port via ngrok). Leave empty for local kubeconfig."
+  description = "External API endpoint (https://0.tcp.in.ngrok.io:<port>). Leave empty for local kubeconfig."
   type        = string
   default     = ""
 }
@@ -18,7 +18,7 @@ variable "k8s_token" {
 }
 
 variable "k8s_ca" {
-  description = "Base64 cluster CA (used when k8s_host is set). Leave empty to allow insecure."
+  description = "Base64 cluster CA (optional when k8s_host is set)"
   type        = string
   default     = ""
   sensitive   = true
@@ -33,7 +33,7 @@ provider "kubernetes" {
   ) ? base64decode(var.k8s_ca) : null
 
   insecure = (
-    var.k8s_host != "" && var.k8s_ca == ""
+    var.k8s_host != ""
   ) ? true : null
 
   config_path = (
