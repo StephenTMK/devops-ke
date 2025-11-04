@@ -1,9 +1,11 @@
+# --- Namespace ---
 resource "kubernetes_namespace" "localstack" {
   metadata {
     name = "localstack"
   }
 }
 
+# --- Deployment ---
 resource "kubernetes_deployment_v1" "localstack" {
   metadata {
     name      = "localstack"
@@ -62,6 +64,7 @@ resource "kubernetes_deployment_v1" "localstack" {
   }
 }
 
+# --- Service ---
 resource "kubernetes_service_v1" "localstack" {
   metadata {
     name      = "localstack"
@@ -82,29 +85,28 @@ resource "kubernetes_service_v1" "localstack" {
   }
 }
 
-# Exposes LocalStack at:
-#   https://rustred-virgilio-noncrystallizable.ngrok-free.dev/localstack
-# Using regex path + rewrite to strip the /localstack prefix.
+# --- Ingress ---
+# Path-based route: https://<your-ngrok-host>/localstack -> Service localstack:4566
+# Regex + rewrite strip the "/localstack" prefix before forwarding.
 resource "kubernetes_ingress_v1" "localstack" {
   metadata {
     name      = "localstack"
     namespace = kubernetes_namespace.localstack.metadata[0].name
     annotations = {
-      "kubernetes.io/ingress.class"                = "nginx"
       "nginx.ingress.kubernetes.io/use-regex"      = "true"
       "nginx.ingress.kubernetes.io/rewrite-target" = "/$2"
     }
   }
 
   spec {
-    rule {
-      host = "rustred-virgilio-noncrystallizable.ngrok-free.dev"
+    ingress_class_name = "nginx"
 
+    # Hostless rule: matches ANY Host header (works with rotating ngrok URLs)
+    rule {
       http {
         path {
           path      = "/localstack(/|$)(.*)"
           path_type = "ImplementationSpecific"
-
           backend {
             service {
               name = kubernetes_service_v1.localstack.metadata[0].name
