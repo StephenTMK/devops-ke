@@ -77,16 +77,21 @@ resource "kubernetes_service_v1" "localstack" {
       name        = "edge"
       port        = 4566
       target_port = 4566
+      protocol    = "TCP"
     }
   }
 }
 
+# Exposes LocalStack at:
+#   https://rustred-virgilio-noncrystallizable.ngrok-free.dev/localstack
+# Using regex path + rewrite to strip the /localstack prefix.
 resource "kubernetes_ingress_v1" "localstack" {
   metadata {
     name      = "localstack"
     namespace = kubernetes_namespace.localstack.metadata[0].name
     annotations = {
       "kubernetes.io/ingress.class"                = "nginx"
+      "nginx.ingress.kubernetes.io/use-regex"      = "true"
       "nginx.ingress.kubernetes.io/rewrite-target" = "/$2"
     }
   }
@@ -98,12 +103,11 @@ resource "kubernetes_ingress_v1" "localstack" {
       http {
         path {
           path      = "/localstack(/|$)(.*)"
-          path_type = "Prefix"
+          path_type = "ImplementationSpecific"
 
           backend {
             service {
               name = kubernetes_service_v1.localstack.metadata[0].name
-
               port {
                 number = 4566
               }
