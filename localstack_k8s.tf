@@ -1,11 +1,9 @@
-# --- Namespace ---
 resource "kubernetes_namespace" "localstack" {
   metadata {
     name = "localstack"
   }
 }
 
-# --- Deployment ---
 resource "kubernetes_deployment_v1" "localstack" {
   metadata {
     name      = "localstack"
@@ -14,23 +12,19 @@ resource "kubernetes_deployment_v1" "localstack" {
       app = "localstack"
     }
   }
-
   spec {
     replicas = 1
-
     selector {
       match_labels = {
         app = "localstack"
       }
     }
-
     template {
       metadata {
         labels = {
           app = "localstack"
         }
       }
-
       spec {
         container {
           name  = "localstack"
@@ -64,18 +58,15 @@ resource "kubernetes_deployment_v1" "localstack" {
   }
 }
 
-# --- Service ---
 resource "kubernetes_service_v1" "localstack" {
   metadata {
     name      = "localstack"
     namespace = kubernetes_namespace.localstack.metadata[0].name
   }
-
   spec {
     selector = {
       app = "localstack"
     }
-
     port {
       name        = "edge"
       port        = 4566
@@ -85,23 +76,17 @@ resource "kubernetes_service_v1" "localstack" {
   }
 }
 
-# --- Ingress ---
-# Path-based route: https://<your-ngrok-host>/localstack -> Service localstack:4566
-# Regex + rewrite strip the "/localstack" prefix before forwarding.
 resource "kubernetes_ingress_v1" "localstack" {
   metadata {
     name      = "localstack"
     namespace = kubernetes_namespace.localstack.metadata[0].name
-    annotations = {
+  annotations = {
       "nginx.ingress.kubernetes.io/use-regex"      = "true"
       "nginx.ingress.kubernetes.io/rewrite-target" = "/$2"
     }
   }
-
   spec {
     ingress_class_name = "nginx"
-
-    # Hostless rule: matches ANY Host header (works with rotating ngrok URLs)
     rule {
       http {
         path {
