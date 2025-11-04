@@ -17,12 +17,19 @@ resource "kubernetes_deployment_v1" "localstack" {
         container {
           name  = "localstack"
           image = "localstack/localstack:latest"
+
           env {
             name  = "SERVICES"
             value = "s3,sqs,iam,sts,lambda,cloudwatch,logs,apigateway,ssm,secretsmanager,dynamodb,ecr,ec2,ecs"
           }
-          env { name = "DEBUG" value = "0" }
+
+          env {
+            name  = "DEBUG"
+            value = "0"
+          }
+
           port { container_port = 4566 } # Edge API
+
           readiness_probe {
             http_get { path = "/_localstack/health" port = 4566 }
             initial_delay_seconds = 5
