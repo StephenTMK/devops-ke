@@ -1,27 +1,27 @@
 variable "kubeconfig_path" {
-  description = "Local kubeconfig path (used when k8s_host is empty)"
   type        = string
   default     = ""
+  description = "Local kubeconfig path (used when k8s_host is empty)"
 }
 
 variable "k8s_host" {
-  description = "External API endpoint (https://0.tcp.in.ngrok.io:<port>). Leave empty for local kubeconfig."
   type        = string
   default     = ""
+  description = "External API endpoint (https://0.tcp.in.ngrok.io:<port>). Leave empty for local kubeconfig."
 }
 
 variable "k8s_token" {
-  description = "Bearer token for the Kubernetes API (used when k8s_host is set)"
   type        = string
   default     = ""
   sensitive   = true
+  description = "Bearer token for the Kubernetes API (used when k8s_host is set)"
 }
 
 variable "k8s_ca" {
-  description = "Base64 cluster CA (optional when k8s_host is set)"
   type        = string
   default     = ""
   sensitive   = true
+  description = "Base64 cluster CA (optional when k8s_host is set)"
 }
 
 provider "kubernetes" {
