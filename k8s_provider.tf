@@ -18,25 +18,25 @@ variable "k8s_token" {
 }
 
 variable "k8s_ca" {
-  description = "Base64 certificate-authority-data (used when k8s_host is set). Leave empty to allow insecure."
+  description = "Base64 cluster CA (used when k8s_host is set). Leave empty to allow insecure."
   type        = string
   default     = ""
   sensitive   = true
 }
 
 provider "kubernetes" {
-  host  = var.k8s_host != "" ? var.k8s_host : null
+  host  = var.k8s_host  != "" ? var.k8s_host  : null
   token = var.k8s_token != "" ? var.k8s_token : null
 
-  cluster_ca_certificate = (var.k8s_host != "" && var.k8s_ca != "")
-    ? base64decode(var.k8s_ca)
-    : null
+  cluster_ca_certificate = (
+    var.k8s_host != "" && var.k8s_ca != ""
+  ) ? base64decode(var.k8s_ca) : null
 
-  insecure = (var.k8s_host != "" && var.k8s_ca == "")
-    ? true
-    : null
+  insecure = (
+    var.k8s_host != "" && var.k8s_ca == ""
+  ) ? true : null
 
-  config_path = (var.k8s_host == "" && var.kubeconfig_path != "")
-    ? var.kubeconfig_path
-    : null
+  config_path = (
+    var.k8s_host == "" && var.kubeconfig_path != ""
+  ) ? var.kubeconfig_path : null
 }
