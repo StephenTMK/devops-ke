@@ -1,18 +1,34 @@
 resource "kubernetes_namespace" "localstack" {
-  metadata { name = "localstack" }
+  metadata {
+    name = "localstack"
+  }
 }
 
 resource "kubernetes_deployment_v1" "localstack" {
   metadata {
     name      = "localstack"
     namespace = kubernetes_namespace.localstack.metadata[0].name
-    labels    = { app = "localstack" }
+    labels = {
+      app = "localstack"
+    }
   }
+
   spec {
     replicas = 1
-    selector { match_labels = { app = "localstack" } }
+
+    selector {
+      match_labels = {
+        app = "localstack"
+      }
+    }
+
     template {
-      metadata { labels = { app = "localstack" } }
+      metadata {
+        labels = {
+          app = "localstack"
+        }
+      }
+
       spec {
         container {
           name  = "localstack"
@@ -28,10 +44,15 @@ resource "kubernetes_deployment_v1" "localstack" {
             value = "0"
           }
 
-          port { container_port = 4566 } # Edge API
+          port {
+            container_port = 4566
+          }
 
           readiness_probe {
-            http_get { path = "/_localstack/health" port = 4566 }
+            http_get {
+              path = "/_localstack/health"
+              port = 4566
+            }
             initial_delay_seconds = 5
             period_seconds        = 5
           }
@@ -46,8 +67,12 @@ resource "kubernetes_service_v1" "localstack" {
     name      = "localstack"
     namespace = kubernetes_namespace.localstack.metadata[0].name
   }
+
   spec {
-    selector = { app = "localstack" }
+    selector = {
+      app = "localstack"
+    }
+
     port {
       name        = "edge"
       port        = 4566
@@ -56,7 +81,6 @@ resource "kubernetes_service_v1" "localstack" {
   }
 }
 
-# Expose LocalStack at: https://rustred-virgilio-noncrystallizable.ngrok-free.dev/localstack
 resource "kubernetes_ingress_v1" "localstack" {
   metadata {
     name      = "localstack"
@@ -66,17 +90,23 @@ resource "kubernetes_ingress_v1" "localstack" {
       "nginx.ingress.kubernetes.io/rewrite-target" = "/$2"
     }
   }
+
   spec {
     rule {
       host = "rustred-virgilio-noncrystallizable.ngrok-free.dev"
+
       http {
         path {
           path      = "/localstack(/|$)(.*)"
           path_type = "Prefix"
+
           backend {
             service {
               name = kubernetes_service_v1.localstack.metadata[0].name
-              port { number = 4566 }
+
+              port {
+                number = 4566
+              }
             }
           }
         }
