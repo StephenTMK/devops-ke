@@ -17,20 +17,9 @@ variable "k8s_token" {
   description = "Bearer token for the Kubernetes API (used when k8s_host is set)"
 }
 
-variable "k8s_ca" {
-  type        = string
-  default     = ""
-  sensitive   = true
-  description = "Base64 cluster CA (optional when k8s_host is set)"
-}
-
 provider "kubernetes" {
   host  = var.k8s_host  != "" ? var.k8s_host  : null
   token = var.k8s_token != "" ? var.k8s_token : null
-
-  cluster_ca_certificate = (
-    var.k8s_host != "" && var.k8s_ca != ""
-  ) ? base64decode(var.k8s_ca) : null
 
   insecure = (
     var.k8s_host != ""
