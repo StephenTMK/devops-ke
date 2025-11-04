@@ -1,5 +1,5 @@
 variable "kubeconfig_path" {
-  description = "Local kubeconfig path (used only when k8s_host is empty)"
+  description = "Local kubeconfig path (used when k8s_host is empty)"
   type        = string
   default     = ""
 }
@@ -18,18 +18,25 @@ variable "k8s_token" {
 }
 
 variable "k8s_ca" {
-  description = "Base64 certificate-authority-data from kubeconfig (used when k8s_host is set)"
+  description = "Base64 certificate-authority-data (used when k8s_host is set). Leave empty to allow insecure."
   type        = string
   default     = ""
   sensitive   = true
 }
 
 provider "kubernetes" {
-  host                   = var.k8s_host != "" ? var.k8s_host : null
-  token                  = var.k8s_token != "" ? var.k8s_token : null
-  cluster_ca_certificate = var.k8s_ca   != "" ? base64decode(var.k8s_ca) : null
+  host  = var.k8s_host != "" ? var.k8s_host : null
+  token = var.k8s_token != "" ? var.k8s_token : null
 
-  config_path = (
-    var.k8s_host == "" && var.kubeconfig_path != ""
-  ) ? var.kubeconfig_path : null
+  cluster_ca_certificate = (var.k8s_host != "" && var.k8s_ca != "")
+    ? base64decode(var.k8s_ca)
+    : null
+
+  insecure = (var.k8s_host != "" && var.k8s_ca == "")
+    ? true
+    : null
+
+  config_path = (var.k8s_host == "" && var.kubeconfig_path != "")
+    ? var.kubeconfig_path
+    : null
 }
