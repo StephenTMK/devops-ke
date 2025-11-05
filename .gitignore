@@ -46,3 +46,10 @@ terraform.plan
 # OS files
 .DS_Store
 Thumbs.db
+# local + secrets + state
+kubeconfig*
+*.crt
+payload.json
+*.tfstate
+*.tfstate.*
+.terraform/
