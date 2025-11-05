@@ -18,9 +18,9 @@ variable "k8s_token_b64" {
 }
 
 locals {
-  k8s_token_clean = (
-    var.k8s_token_b64 != ""
-  ) ? regexreplace(trimspace(base64decode(var.k8s_token_b64)), "\\r|\\n", "") : null
+  k8s_token_decoded = var.k8s_token_b64 != "" ? base64decode(var.k8s_token_b64) : ""
+  k8s_token_trimmed = var.k8s_token_b64 != "" ? trimspace(local.k8s_token_decoded) : ""
+  k8s_token_clean   = var.k8s_token_b64 != "" ? replace(replace(local.k8s_token_trimmed, "\r", ""), "\n", "") : null
 }
 
 provider "kubernetes" {
