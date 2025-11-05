@@ -8,6 +8,9 @@ resource "kubernetes_namespace" "demo" {
   metadata {
     name = var.k8s_namespace
   }
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "kubernetes_config_map_v1" "hello" {
@@ -43,9 +46,9 @@ resource "kubernetes_deployment_v1" "nginx" {
       }
       spec {
         container {
-          name  = "nginx"
-          image = "nginxinc/nginx-unprivileged:1.25-alpine"
-          image_pull_policy = "IfNotPresent"
+          name               = "nginx"
+          image              = "nginxinc/nginx-unprivileged:1.25-alpine"
+          image_pull_policy  = "IfNotPresent"
           port {
             container_port = 80
           }

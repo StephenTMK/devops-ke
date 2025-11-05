@@ -7,14 +7,14 @@ variable "kubeconfig_path" {
 variable "k8s_host" {
   type        = string
   default     = ""
-  description = "External API endpoint (https://0.tcp.in.ngrok.io:<port>). Leave empty for local kubeconfig."
+  description = "External API endpoint"
 }
 
 variable "k8s_token_b64" {
   type        = string
   default     = ""
   sensitive   = true
-  description = "Base64-encoded bearer token (single line)."
+  description = "Base64-encoded bearer token"
 }
 
 locals {

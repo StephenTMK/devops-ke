@@ -1,11 +1,11 @@
 variable "aws_region" {
-  description = "Region placeholder (LocalStack ignores it but provider needs one)."
+  description = "Region placeholder"
   type        = string
   default     = "us-east-1"
 }
 
 variable "localstack_base_url" {
-  description = "Public/Base URL to LocalStack Edge (e.g., http://localhost/localstack or https://<ngrok>/localstack)"
+  description = "Base URL to LocalStack Edge"
   type        = string
   default     = "http://localhost/localstack"
 }
