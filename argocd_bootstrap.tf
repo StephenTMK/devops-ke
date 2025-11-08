@@ -16,4 +16,9 @@ resource "helm_release" "argocd" {
   create_namespace = false
   wait             = true
   timeout          = 600
+
+  set {
+    name  = "installCRDs"
+    value = "true"
+  }
 }

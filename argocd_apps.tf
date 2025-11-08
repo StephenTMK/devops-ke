@@ -22,7 +22,7 @@ spec:
       - CreateNamespace=true
 YAML
   )
-  depends_on = [helm_release.argocd]
+  depends_on = [time_sleep.wait_for_argocd_crds]
 }
 
 resource "kubernetes_manifest" "app_crossplane_aws_localstack" {
@@ -49,5 +49,5 @@ spec:
       - ServerSideApply=true
 YAML
   )
-  depends_on = [helm_release.argocd]
+  depends_on = [time_sleep.wait_for_argocd_crds]
 }
