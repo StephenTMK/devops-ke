@@ -1,10 +1,6 @@
 resource "kubernetes_namespace" "argocd" {
-  metadata {
-    name = "argocd"
-  }
-  lifecycle {
-    prevent_destroy = true
-  }
+  metadata { name = "argocd" }
+  lifecycle { prevent_destroy = true }
 }
 
 resource "helm_release" "argocd" {
