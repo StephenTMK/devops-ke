@@ -5,9 +5,14 @@ variable "aws_region" {
 }
 
 variable "localstack_base_url" {
-  description = "Base URL to LocalStack Edge"
+  description = "Base URL to LocalStack Edge (e.g., https://<ngrok-host>/localstack). No trailing spaces."
   type        = string
-  default     = "http://localhost/localstack"
+}
+
+variable "bucket_suffix" {
+  description = "Optional suffix to avoid bucket name collisions per stack"
+  type        = string
+  default     = ""
 }
 
 provider "aws" {
@@ -38,7 +43,7 @@ provider "aws" {
 }
 
 locals {
-  bucket_name = "demo-bucket-localstack-001"
+  bucket_name = "demo-bucket-localstack-001${var.bucket_suffix}"
 }
 
 resource "aws_s3_bucket" "demo" {
