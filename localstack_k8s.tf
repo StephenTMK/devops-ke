@@ -100,7 +100,7 @@ resource "kubernetes_ingress_v1" "localstack_ingress" {
   spec {
     ingress_class_name = "nginx"
 
-    # Serve via argocd.local (if your hosts file sends it to nginx)
+    # Serve via argocd.local
     rule {
       host = "argocd.local"
       http {
@@ -119,7 +119,7 @@ resource "kubernetes_ingress_v1" "localstack_ingress" {
       }
     }
 
-    # Wildcard (ngrok host without Host header match)
+    # Wildcard (no host)
     rule {
       http {
         path {

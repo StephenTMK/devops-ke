@@ -7,14 +7,14 @@ variable "kubeconfig_path" {
 variable "k8s_host" {
   type        = string
   default     = ""
-  description = "External API endpoint"
+  description = "External API endpoint (e.g. https://7.tcp.eu.ngrok.io:10356)"
 }
 
 variable "k8s_token_b64" {
   type        = string
   default     = ""
   sensitive   = true
-  description = "Base64-encoded bearer token"
+  description = "Base64-encoded bearer token for the cluster"
 }
 
 locals {
@@ -28,4 +28,18 @@ provider "kubernetes" {
   token       = local.k8s_token_clean
   insecure    = var.k8s_host != "" ? true : null
   config_path = (var.k8s_host == "" && var.kubeconfig_path != "") ? var.kubeconfig_path : null
+
+  experiments {
+    # Needed for kubernetes_manifest (Argo Application CRs)
+    manifest_resource = true
+  }
+}
+
+provider "helm" {
+  kubernetes {
+    host        = var.k8s_host != "" ? var.k8s_host : null
+    token       = local.k8s_token_clean
+    insecure    = var.k8s_host != "" ? true : null
+    config_path = (var.k8s_host == "" && var.kubeconfig_path != "") ? var.kubeconfig_path : null
+  }
 }
