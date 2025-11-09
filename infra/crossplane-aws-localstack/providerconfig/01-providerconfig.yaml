@@ -2,10 +2,13 @@ apiVersion: aws.upbound.io/v1beta1
 kind: ProviderConfig
 metadata:
   name: default
+  namespace: crossplane-system
 spec:
+  region: us-east-1
   credentials:
     source: Secret
     secretRef:
       namespace: crossplane-system
       name: aws-creds-localstack
       key: creds
+  # Optional localstack endpoints (if you’re wiring them via ControllerConfig, keep that file too)
