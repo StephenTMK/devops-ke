@@ -19,6 +19,12 @@ resource "helm_release" "argocd" {
     value = "true"
   }
 
+  # Serve HTTP on port 80 so our Ingress can route without TLS passthrough
+  set {
+    name  = "server.extraArgs[0]"
+    value = "--insecure"
+  }
+
   # Argo health customization to avoid Crossplane Provider “Unknown/ComparisonError”
   values = [<<-YAML
 configs:
