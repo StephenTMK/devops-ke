@@ -1,4 +1,5 @@
 provider "helm" {
+  alias = "alt"
   kubernetes {
     host        = var.k8s_host != "" ? var.k8s_host : null
     token       = local.k8s_token_clean
