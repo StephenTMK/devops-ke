@@ -28,11 +28,6 @@ provider "kubernetes" {
   token       = local.k8s_token_clean
   insecure    = var.k8s_host != "" ? true : null
   config_path = (var.k8s_host == "" && var.kubeconfig_path != "") ? var.kubeconfig_path : null
-
-  experiments {
-    # Needed for kubernetes_manifest (Argo Application CRs)
-    manifest_resource = true
-  }
 }
 
 provider "helm" {
