@@ -84,66 +84,11 @@ resource "kubernetes_service_v1" "localstack" {
   }
 }
 
-# Ingress 1: Exact /localstack -> rewrite to "/"
-resource "kubernetes_ingress_v1" "localstack_root" {
+# Single ingress for /localstack and all subpaths.
+# Regex strips the /localstack prefix and forwards to LocalStack.
+resource "kubernetes_ingress_v1" "localstack_ingress" {
   metadata {
-    name      = "localstack-root"
-    namespace = kubernetes_namespace.localstack.metadata[0].name
-    annotations = {
-      "kubernetes.io/ingress.class"                = "nginx"
-      "nginx.ingress.kubernetes.io/rewrite-target" = "/"
-    }
-  }
-
-  spec {
-    ingress_class_name = "nginx"
-
-    # Host = argocd.local
-    rule {
-      host = "argocd.local"
-
-      http {
-        path {
-          path      = "/localstack"
-          path_type = "Exact"
-
-          backend {
-            service {
-              name = kubernetes_service_v1.localstack.metadata[0].name
-              port {
-                number = 4566
-              }
-            }
-          }
-        }
-      }
-    }
-
-    # No host (ngrok wildcard)
-    rule {
-      http {
-        path {
-          path      = "/localstack"
-          path_type = "Exact"
-
-          backend {
-            service {
-              name = kubernetes_service_v1.localstack.metadata[0].name
-              port {
-                number = 4566
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-# Ingress 2: /localstack/... -> strip prefix and forward (/$1)
-resource "kubernetes_ingress_v1" "localstack_subpaths" {
-  metadata {
-    name      = "localstack-subpaths"
+    name      = "localstack"
     namespace = kubernetes_namespace.localstack.metadata[0].name
     annotations = {
       "kubernetes.io/ingress.class"                = "nginx"
@@ -155,15 +100,13 @@ resource "kubernetes_ingress_v1" "localstack_subpaths" {
   spec {
     ingress_class_name = "nginx"
 
-    # Host = argocd.local
+    # Serve via argocd.local (if your hosts file sends it to nginx)
     rule {
       host = "argocd.local"
-
       http {
         path {
           path      = "^/localstack/?(.*)"
           path_type = "ImplementationSpecific"
-
           backend {
             service {
               name = kubernetes_service_v1.localstack.metadata[0].name
@@ -176,13 +119,12 @@ resource "kubernetes_ingress_v1" "localstack_subpaths" {
       }
     }
 
-    # No host (ngrok wildcard)
+    # Wildcard (ngrok host without Host header match)
     rule {
       http {
         path {
           path      = "^/localstack/?(.*)"
           path_type = "ImplementationSpecific"
-
           backend {
             service {
               name = kubernetes_service_v1.localstack.metadata[0].name
@@ -195,9 +137,13 @@ resource "kubernetes_ingress_v1" "localstack_subpaths" {
       }
     }
   }
+
+  depends_on = [
+    time_sleep.wait_k8s_api
+  ]
 }
 
-# Ingress 3: /localstack/healthz -> force JSON from /_localstack/health
+# Separate health endpoint: force JSON from /_localstack/health.
 resource "kubernetes_ingress_v1" "localstack_healthz" {
   metadata {
     name      = "localstack-healthz"
@@ -217,12 +163,10 @@ resource "kubernetes_ingress_v1" "localstack_healthz" {
 
     rule {
       host = "argocd.local"
-
       http {
         path {
           path      = "/localstack/healthz"
           path_type = "Exact"
-
           backend {
             service {
               name = kubernetes_service_v1.localstack.metadata[0].name
@@ -240,7 +184,6 @@ resource "kubernetes_ingress_v1" "localstack_healthz" {
         path {
           path      = "/localstack/healthz"
           path_type = "Exact"
-
           backend {
             service {
               name = kubernetes_service_v1.localstack.metadata[0].name
@@ -253,4 +196,8 @@ resource "kubernetes_ingress_v1" "localstack_healthz" {
       }
     }
   }
+
+  depends_on = [
+    time_sleep.wait_k8s_api
+  ]
 }
