@@ -43,7 +43,7 @@ provider "aws" {
 }
 
 locals {
-  bucket_name = "demo-iac-bucket-localstack-001${var.bucket_suffix}"
+  bucket_name = "demo-iac-bucket-localstack-002${var.bucket_suffix}"
 }
 
 resource "aws_s3_bucket" "demo-iac" {
