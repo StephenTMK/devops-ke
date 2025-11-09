@@ -36,7 +36,7 @@ applications:
       server: https://kubernetes.default.svc
       namespace: crossplane-system
     source:
-      repoURL: https://github.com/you/spacelift-tf-test.git
+      repoURL: https://github.com/StephenTMK/devops-ke 
       targetRevision: main
       path: infra/crossplane-aws-localstack
     syncPolicy:
