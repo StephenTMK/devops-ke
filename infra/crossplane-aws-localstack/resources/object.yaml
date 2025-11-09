@@ -1,10 +1,14 @@
 apiVersion: s3.aws.upbound.io/v1beta1
-kind: Bucket
+kind: BucketObject
 metadata:
-  name: demo-localstack-bucket
+  name: hello-txt
   namespace: crossplane-system
 spec:
   forProvider:
+    bucketRef:
+      name: demo-localstack-bucket
+    key: hello.txt
+    content: "hello from crossplane via localstack"
     region: us-east-1
   providerConfigRef:
     name: default
