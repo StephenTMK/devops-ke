@@ -1,0 +1,24 @@
+---
+apiVersion: s3.aws.upbound.io/v1beta1
+kind: Bucket
+metadata:
+  name: demo-localstack-bucket
+spec:
+  forProvider:
+    region: us-east-1
+    forceDestroy: true
+  providerConfigRef:
+    name: default
+---
+apiVersion: s3.aws.upbound.io/v1beta1
+kind: BucketObject
+metadata:
+  name: hello-txt
+spec:
+  forProvider:
+    bucket: demo-localstack-bucket
+    key: hello.txt
+    content: "Hello from Crossplane via LocalStack!"
+    region: us-east-1
+  providerConfigRef:
+    name: default
