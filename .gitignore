@@ -53,3 +53,7 @@ payload.json
 *.tfstate
 *.tfstate.*
 .terraform/
+# never commit credentials
+**/*credentials*.yaml
+**/*creds*.yaml
+infra/crossplane-aws-localstack/03-credentials.yaml

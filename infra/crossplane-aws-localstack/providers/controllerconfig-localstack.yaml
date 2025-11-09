@@ -1,21 +1,16 @@
 apiVersion: pkg.crossplane.io/v1alpha1
 kind: ControllerConfig
 metadata:
-  name: localstack-cc
+  name: aws-localstack
   namespace: crossplane-system
+# NOTE: No credentials here. Provider uses ProviderConfig->SecretRef for creds.
 spec:
-  args:
-    - --enable-management-policies
   env:
-    - name: AWS_ACCESS_KEY_ID
-      value: test
-    - name: AWS_SECRET_ACCESS_KEY
-      value: test
     - name: AWS_REGION
       value: us-east-1
-    # One env var to point all AWS clients to LocalStack:
+    # Tell AWS SDK in the provider controller to use LocalStack for all services
     - name: AWS_ENDPOINT_URL
       value: http://localstack.localstack.svc.cluster.local:4566
-  securityContext:
-    runAsUser: 1000
-    runAsGroup: 1000
+  # Optional: more relaxed liveness/readiness when using tunnels
+  podSecurityContext:
+    runAsNonRoot: true
