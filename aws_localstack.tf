@@ -43,19 +43,19 @@ provider "aws" {
 }
 
 locals {
-  bucket_name = "demo-bucket-localstack-001${var.bucket_suffix}"
+  bucket_name = "demo-iac-bucket-localstack-001${var.bucket_suffix}"
 }
 
-resource "aws_s3_bucket" "demo" {
+resource "aws_s3_bucket" "demo-iac" {
   bucket = local.bucket_name
 }
 
 resource "aws_s3_object" "welcome" {
-  bucket  = aws_s3_bucket.demo.id
+  bucket  = aws_s3_bucket.demo-iac.id
   key     = "hello.txt"
   content = "Hello from Terraform via LocalStack!"
 }
 
 output "s3_bucket_name" {
-  value = aws_s3_bucket.demo.bucket
+  value = aws_s3_bucket.demo-iac.bucket
 }
