@@ -5,14 +5,8 @@ variable "aws_region" {
 }
 
 variable "localstack_base_url" {
-  description = "Base URL to LocalStack Edge (e.g., https://<ngrok-host>/localstack). No trailing spaces."
+  description = "Base URL to LocalStack Edge (e.g., https://<ngrok-host>/localstack). No trailing slash."
   type        = string
-}
-
-variable "bucket_suffix" {
-  description = "Optional suffix to avoid bucket name collisions per stack"
-  type        = string
-  default     = ""
 }
 
 provider "aws" {
@@ -41,21 +35,3 @@ provider "aws" {
     sts            = var.localstack_base_url
   }
 }
-
-#locals {
-#  bucket_name = "demo-iac-bucket-localstack-002${var.bucket_suffix}"
-#}
-
-#resource "aws_s3_bucket" "demo-iac" {
-#  bucket = local.bucket_name
-#}
-#
-#resource "aws_s3_object" "welcome" {
-#  bucket  = aws_s3_bucket.demo-iac.id
-#  key     = "hello.txt"
-#  content = "Hello from Terraform via LocalStack!"
-#}
-
-#output "s3_bucket_name" {
-#  value = aws_s3_bucket.demo-iac.bucket
-#}
