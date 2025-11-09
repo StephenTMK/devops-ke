@@ -42,20 +42,20 @@ provider "aws" {
   }
 }
 
-locals {
-  bucket_name = "demo-iac-bucket-localstack-002${var.bucket_suffix}"
-}
+#locals {
+#  bucket_name = "demo-iac-bucket-localstack-002${var.bucket_suffix}"
+#}
 
-resource "aws_s3_bucket" "demo-iac" {
-  bucket = local.bucket_name
-}
+#resource "aws_s3_bucket" "demo-iac" {
+#  bucket = local.bucket_name
+#}
+#
+#resource "aws_s3_object" "welcome" {
+#  bucket  = aws_s3_bucket.demo-iac.id
+#  key     = "hello.txt"
+#  content = "Hello from Terraform via LocalStack!"
+#}
 
-resource "aws_s3_object" "welcome" {
-  bucket  = aws_s3_bucket.demo-iac.id
-  key     = "hello.txt"
-  content = "Hello from Terraform via LocalStack!"
-}
-
-output "s3_bucket_name" {
-  value = aws_s3_bucket.demo-iac.bucket
-}
+#output "s3_bucket_name" {
+#  value = aws_s3_bucket.demo-iac.bucket
+#}
