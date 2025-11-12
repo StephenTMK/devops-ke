@@ -16,25 +16,35 @@ resource "kubernetes_ingress_v1" "argocd" {
   spec {
     ingress_class_name = "nginx"
 
-    # host rule
+    # Named host
     rule {
       host = var.argocd_host
       http {
         path {
           path      = "/"
           path_type = "Prefix"
-          backend { service { name = "argocd-server" port { number = 80 } } }
+          backend {
+            service {
+              name = "argocd-server"
+              port { number = 80 }
+            }
+          }
         }
       }
     }
 
-    # wildcard (works with raw ngrok host header too)
+    # Wildcard rule (ngrok direct host)
     rule {
       http {
         path {
           path      = "/"
           path_type = "Prefix"
-          backend { service { name = "argocd-server" port { number = 80 } } }
+          backend {
+            service {
+              name = "argocd-server"
+              port { number = 80 }
+            }
+          }
         }
       }
     }

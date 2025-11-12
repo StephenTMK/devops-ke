@@ -7,10 +7,6 @@ spec:
   credentials:
     source: Secret
     secretRef:
-      name: aws-creds-localstack
       namespace: crossplane-system
-      key: creds
-  endpoint:
-    url:
-      type: Static
-      static: http://localstack.localstack.svc.cluster.local:4566
+      name: aws-creds-localstack     # created by Terraform (not committed)
+      key: creds                      # INI content

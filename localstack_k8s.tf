@@ -9,6 +9,7 @@ resource "kubernetes_deployment_v1" "localstack" {
     namespace = kubernetes_namespace.localstack.metadata[0].name
     labels = { app = "localstack" }
   }
+
   spec {
     replicas = 1
     selector { match_labels = { app = "localstack" } }
@@ -19,8 +20,11 @@ resource "kubernetes_deployment_v1" "localstack" {
           name  = "localstack"
           image = "localstack/localstack:latest"
 
-          env { name = "SERVICES" value = "s3,sqs,iam,sts,lambda,cloudwatch,logs,apigateway,ssm,secretsmanager,dynamodb,ecr,ec2,ecs" }
-          env { name = "DEBUG"    value = "0"  }
+          env {
+            name  = "SERVICES"
+            value = "s3,sqs,iam,sts,lambda,cloudwatch,logs,apigateway,ssm,secretsmanager,dynamodb,ecr,ec2,ecs"
+          }
+          env { name = "DEBUG" value = "0" }
 
           port { container_port = 4566 }
 
@@ -42,11 +46,16 @@ resource "kubernetes_service_v1" "localstack" {
   }
   spec {
     selector = { app = "localstack" }
-    port { name = "edge" port = 4566 target_port = 4566 protocol = "TCP" }
+    port {
+      name        = "edge"
+      port        = 4566
+      target_port = 4566
+      protocol    = "TCP"
+    }
   }
 }
 
-# /localstack and all subpaths -> strip prefix
+# Prefix-stripping ingress for /localstack and subpaths
 resource "kubernetes_ingress_v1" "localstack_ingress" {
   metadata {
     name      = "localstack"
@@ -57,6 +66,7 @@ resource "kubernetes_ingress_v1" "localstack_ingress" {
       "nginx.ingress.kubernetes.io/rewrite-target" = "/$2"
     }
   }
+
   spec {
     ingress_class_name = "nginx"
 
@@ -71,7 +81,6 @@ resource "kubernetes_ingress_v1" "localstack_ingress" {
       }
     }
 
-    # wildcard rule (raw ngrok host)
     rule {
       http {
         path {
@@ -83,10 +92,10 @@ resource "kubernetes_ingress_v1" "localstack_ingress" {
     }
   }
 
-  depends_on = [ time_sleep.wait_k8s_api ]
+  depends_on = [time_sleep.wait_k8s_api]
 }
 
-# /localstack/healthz -> /_localstack/health  (no snippet annotations)
+# Dedicated JSON health endpoint mapping /localstack/healthz -> /_localstack/health
 resource "kubernetes_ingress_v1" "localstack_healthz" {
   metadata {
     name      = "localstack-healthz"
@@ -98,13 +107,28 @@ resource "kubernetes_ingress_v1" "localstack_healthz" {
   }
   spec {
     ingress_class_name = "nginx"
+
     rule {
       host = "argocd.local"
-      http { path { path = "/localstack/healthz" path_type = "Exact" backend { service { name = kubernetes_service_v1.localstack.metadata[0].name  port { number = 4566 } } } } }
+      http {
+        path {
+          path      = "/localstack/healthz"
+          path_type = "Exact"
+          backend { service { name = kubernetes_service_v1.localstack.metadata[0].name  port { number = 4566 } } }
+        }
+      }
     }
+
     rule {
-      http { path { path = "/localstack/healthz" path_type = "Exact" backend { service { name = kubernetes_service_v1.localstack.metadata[0].name  port { number = 4566 } } } } }
+      http {
+        path {
+          path      = "/localstack/healthz"
+          path_type = "Exact"
+          backend { service { name = kubernetes_service_v1.localstack.metadata[0].name  port { number = 4566 } } }
+        }
+      }
     }
   }
-  depends_on = [ time_sleep.wait_k8s_api ]
+
+  depends_on = [time_sleep.wait_k8s_api]
 }

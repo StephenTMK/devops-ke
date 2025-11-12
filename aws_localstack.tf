@@ -5,7 +5,7 @@ variable "aws_region" {
 }
 
 variable "localstack_base_url" {
-  description = "Base URL to LocalStack Edge (e.g., https://<ngrok-host>/localstack). No trailing slash."
+  description = "Base URL to LocalStack Edge (e.g., https://<ngrok-host>/localstack) — NO trailing slash"
   type        = string
 }
 

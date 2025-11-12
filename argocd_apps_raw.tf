@@ -31,7 +31,7 @@ YAML
   depends_on = [time_sleep.wait_for_argocd_ready]
 }
 
-# 1) Providers (family + s3) — uses ControllerConfig: aws-localstack-cc
+# 1) Providers & ControllerConfig (wave -2)
 resource "kubernetes_manifest" "app_crossplane_providers" {
   manifest = yamldecode(<<YAML
 apiVersion: argoproj.io/v1alpha1
@@ -61,7 +61,7 @@ YAML
   depends_on = [kubernetes_manifest.app_crossplane_core]
 }
 
-# 2) ProviderConfig + Secret (draws credentials from Secret name aws-creds in crossplane-system)
+# 2) ProviderConfig (Secret referenced) (wave -1)
 resource "kubernetes_manifest" "app_crossplane_providerconfig" {
   manifest = yamldecode(<<YAML
 apiVersion: argoproj.io/v1alpha1
@@ -91,7 +91,7 @@ YAML
   depends_on = [kubernetes_manifest.app_crossplane_providers]
 }
 
-# 3) Example resources (S3 bucket against LocalStack)
+# 3) Example resources (e.g. S3 bucket) (wave +1)
 resource "kubernetes_manifest" "app_crossplane_bucket" {
   manifest = yamldecode(<<YAML
 apiVersion: argoproj.io/v1alpha1
