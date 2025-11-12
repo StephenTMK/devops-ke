@@ -2,60 +2,44 @@
 set -euo pipefail
 
 NS="crossplane-system"
-SECRET="aws-creds"
+SECRET_NAME="aws-creds"
 
-# Read from either plain env or TF vars that Spacelift injects
-K8S_HOST="${K8S_HOST:-${TF_VAR_k8s_host:-}}"
-K8S_TOKEN_B64="${K8S_TOKEN_B64:-${TF_VAR_k8s_token_b64:-}}"
-
-AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID:-test}"
-AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY:-test}"
-
-if [[ -z "${K8S_HOST}" || -z "${K8S_TOKEN_B64}" ]]; then
-  echo "FATAL: K8S_HOST / K8S_TOKEN_B64 not present. Set Terraform variables 'k8s_host' and 'k8s_token_b64' on the stack (or env K8S_HOST/K8S_TOKEN_B64)." >&2
-  exit 1
+# Ensure kubectl exists on the runner (install a small static build if missing)
+if ! command -v kubectl >/dev/null 2>&1; then
+  echo "kubectl not found - installing..."
+  curl -sSL -o /tmp/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.30.0/bin/linux/amd64/kubectl
+  chmod +x /tmp/kubectl
+  KUBECTL=/tmp/kubectl
+else
+  KUBECTL=kubectl
 fi
 
-# download a tiny kubectl binary
-KUBECTL=/tmp/kubectl
-if ! command -v "$KUBECTL" >/dev/null 2>&1; then
-  curl -fsSL -o "$KUBECTL" https://storage.googleapis.com/kubernetes-release/release/v1.28.4/bin/linux/amd64/kubectl
-  chmod +x "$KUBECTL"
+# Obtain creds from env (Spacelift: set these as Stack Environment Variables or Mounted Variables)
+AK="${AWS_ACCESS_KEY_ID:-}"
+SK="${AWS_SECRET_ACCESS_KEY:-}"
+if [[ -z "$AK" || -z "$SK" ]]; then
+  echo "ERROR: AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY env vars are required"; exit 1
 fi
 
-# build kubeconfig from the token (skip TLS since you’re behind ngrok)
-TOKEN="$(printf %s "$K8S_TOKEN_B64" | base64 -d 2>/dev/null | tr -d '\r\n')"
-KCFG=/tmp/kubeconfig
-cat > "$KCFG" <<YAML
-apiVersion: v1
-kind: Config
-clusters:
-- cluster:
-    server: "${K8S_HOST}"
-    insecure-skip-tls-verify: true
-  name: cluster
-contexts:
-- context:
-    cluster: cluster
-    user: user
-  name: ctx
-current-context: ctx
-users:
-- name: user
-  user:
-    token: "${TOKEN}"
-YAML
+# Build INI in-memory
+INI="[default]
+aws_access_key_id = ${AK}
+aws_secret_access_key = ${SK}
+"
 
-# Idempotent create-or-update of the Secret (never stored in TF state)
-INI="$(printf "[default]\naws_access_key_id = %s\naws_secret_access_key = %s\n" \
-      "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY")"
+# Create ns if missing (idempotent)
+$KUBECTL get ns "$NS" >/dev/null 2>&1 || $KUBECTL create ns "$NS"
 
-# If API is reachable, this "apply" is idempotent. If you truly want "skip if exists", uncomment the short-circuit below.
-# if "$KUBECTL" --kubeconfig "$KCFG" -n "$NS" get secret "$SECRET" >/dev/null 2>&1; then
-#   echo "Secret/$SECRET already exists – skipping."
-#   exit 0
-# fi
+# Upsert secret idempotently (avoid exposing content in logs)
+if $KUBECTL -n "$NS" get secret "$SECRET_NAME" >/dev/null 2>&1; then
+  echo "Secret $NS/$SECRET_NAME exists — patching data..."
+  $KUBECTL -n "$NS" create secret generic "$SECRET_NAME" \
+    --from-literal=creds="$INI" \
+    -o yaml --dry-run=client | $KUBECTL apply -f -
+else
+  echo "Creating secret $NS/$SECRET_NAME ..."
+  $KUBECTL -n "$NS" create secret generic "$SECRET_NAME" \
+    --from-literal=creds="$INI" >/dev/null
+fi
 
-"$KUBECTL" --kubeconfig "$KCFG" -n "$NS" create secret generic "$SECRET" \
-  --from-literal=creds="$INI" \
-  --dry-run=client -o yaml | "$KUBECTL" --kubeconfig "$KCFG" apply -f -
+echo "OK: secret $NS/$SECRET_NAME is present."

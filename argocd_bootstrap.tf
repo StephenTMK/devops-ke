@@ -13,19 +13,13 @@ resource "helm_release" "argocd" {
   wait             = true
   timeout          = 600
 
-  # Install CRDs so Application CRs are valid
-  set {
-    name  = "installCRDs"
-    value = "true"
-  }
+  # ArgoCD CRDs
+  set { name = "installCRDs"           value = "true" }
 
-  # Serve HTTP on port 80 so our Ingress can route without TLS passthrough
-  set {
-    name  = "server.extraArgs[0]"
-    value = "--insecure"
-  }
+  # We serve HTTP so our NGINX Ingress can terminate (no TLS passthrough)
+  set { name = "server.extraArgs[0]"   value = "--insecure" }
 
-  # Argo health customization to avoid Crossplane Provider “Unknown/ComparisonError”
+  # Custom Argo health for Crossplane Provider objects (prevents Unknown/ComparisonError)
   values = [<<-YAML
 configs:
   cm:
@@ -75,4 +69,10 @@ configs:
       return hs
 YAML
   ]
+}
+
+# give webhooks & controllers a moment to settle
+resource "time_sleep" "wait_for_argocd_ready" {
+  depends_on      = [helm_release.argocd]
+  create_duration = "30s"
 }

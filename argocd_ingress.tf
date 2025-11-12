@@ -9,7 +9,6 @@ resource "kubernetes_ingress_v1" "argocd" {
     name      = "argocd"
     namespace = "argocd"
     annotations = {
-      # ArgoCD is running with --insecure (HTTP), so do not force TLS
       "nginx.ingress.kubernetes.io/force-ssl-redirect" = "false"
     }
   }
@@ -17,35 +16,25 @@ resource "kubernetes_ingress_v1" "argocd" {
   spec {
     ingress_class_name = "nginx"
 
-    # 1) Named host rule
+    # host rule
     rule {
       host = var.argocd_host
       http {
         path {
           path      = "/"
           path_type = "Prefix"
-          backend {
-            service {
-              name = "argocd-server"
-              port { number = 80 }
-            }
-          }
+          backend { service { name = "argocd-server" port { number = 80 } } }
         }
       }
     }
 
-    # 2) Wildcard rule so a raw ngrok hostname works too
+    # wildcard (works with raw ngrok host header too)
     rule {
       http {
         path {
           path      = "/"
           path_type = "Prefix"
-          backend {
-            service {
-              name = "argocd-server"
-              port { number = 80 }
-            }
-          }
+          backend { service { name = "argocd-server" port { number = 80 } } }
         }
       }
     }

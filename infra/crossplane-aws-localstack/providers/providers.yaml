@@ -13,17 +13,17 @@ spec:
     - name: AWS_REGION
       value: us-east-1
 ---
-# Family (meta) provider – keeps shared types
+# Family provider – shared types/infra
 apiVersion: pkg.crossplane.io/v1
 kind: Provider
 metadata:
-  name: provider-aws
+  name: provider-family-aws
 spec:
   package: xpkg.upbound.io/upbound/provider-family-aws:v1.2.0
   controllerConfigRef:
     name: aws-localstack-cc
 ---
-# S3 sub-provider – brings in s3.aws.upbound.io CRDs
+# S3 sub-provider – s3.aws.upbound.io CRDs
 apiVersion: pkg.crossplane.io/v1
 kind: Provider
 metadata:

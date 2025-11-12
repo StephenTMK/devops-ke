@@ -4,10 +4,16 @@ metadata:
   name: default
   namespace: crossplane-system
 spec:
-  region: us-east-1
   credentials:
     source: Secret
     secretRef:
       namespace: crossplane-system
       name: aws-creds
       key: creds
+  endpoint:
+    hostnameImmutable: true
+    url:
+      type: Static
+      static: http://localstack.localstack.svc.cluster.local:4566
+  assumeRoleChain:
+    enabled: false

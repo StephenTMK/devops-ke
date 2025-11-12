@@ -6,3 +6,6 @@ metadata:
 spec:
   forProvider:
     region: us-east-1
+    forceDestroy: true
+  providerConfigRef:
+    name: default

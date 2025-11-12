@@ -1,4 +1,37 @@
-# 1) Crossplane core (sync wave -2 to happen before providerconfig/resources if you house it in the same repo)
+# 0) Crossplane core via Argo CD (install Helm chart first)
+resource "kubernetes_manifest" "app_crossplane_core" {
+  manifest = yamldecode(<<YAML
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: crossplane
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-3"
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: crossplane-system
+  source:
+    repoURL: https://charts.crossplane.io/stable
+    chart: crossplane
+    targetRevision: 1.15.0
+    helm:
+      releaseName: crossplane
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+YAML
+  )
+  depends_on = [time_sleep.wait_for_argocd_ready]
+}
+
+# 1) Providers (family + s3) — uses ControllerConfig: aws-localstack-cc
 resource "kubernetes_manifest" "app_crossplane_providers" {
   manifest = yamldecode(<<YAML
 apiVersion: argoproj.io/v1alpha1
@@ -25,10 +58,10 @@ spec:
       - ServerSideApply=true
 YAML
   )
-  depends_on = [time_sleep.wait_for_argocd_ready]
+  depends_on = [kubernetes_manifest.app_crossplane_core]
 }
 
-# 2) ProviderConfig (+ Secret) (sync wave -1)
+# 2) ProviderConfig + Secret (draws credentials from Secret name aws-creds in crossplane-system)
 resource "kubernetes_manifest" "app_crossplane_providerconfig" {
   manifest = yamldecode(<<YAML
 apiVersion: argoproj.io/v1alpha1
@@ -58,7 +91,7 @@ YAML
   depends_on = [kubernetes_manifest.app_crossplane_providers]
 }
 
-# 3) Example resources (e.g., S3 bucket against LocalStack) (sync wave +1)
+# 3) Example resources (S3 bucket against LocalStack)
 resource "kubernetes_manifest" "app_crossplane_bucket" {
   manifest = yamldecode(<<YAML
 apiVersion: argoproj.io/v1alpha1
