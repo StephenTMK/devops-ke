@@ -33,7 +33,7 @@ resource "kubernetes_ingress_v1" "argocd" {
       }
     }
 
-    # Wildcard rule (ngrok direct host)
+    # Wildcard (no host header match)
     rule {
       http {
         path {

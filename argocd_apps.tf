@@ -1,20 +1,17 @@
 resource "helm_release" "argocd_apps" {
-  name             = "argocd-apps"
-  repository       = "https://argoproj.github.io/argo-helm"
-  chart            = "argocd-apps"
-  version          = "1.6.2"
-  namespace        = "argocd"
-  create_namespace = false
-  wait             = true
-  timeout          = 600
+  name       = "argocd-apps"
+  repository = "https://argoproj.github.io/argo-helm"
+  chart      = "argocd-apps"
+  version    = "1.6.2"
+  namespace  = "argocd"
+  wait       = true
+  timeout    = 600
 
-  # Make sure Argo CD (and its CRDs) exist before creating Application CRs.
   depends_on = [
     helm_release.argocd,
     time_sleep.wait_for_argocd_ready
   ]
 
-  # Define the Applications in values so Helm renders them server-side after Argo is ready.
   values = [<<-YAML
 applications:
   # 0) Install Crossplane core via its Helm chart
@@ -62,7 +59,7 @@ applications:
       annotations:
         argocd.argoproj.io/sync-wave: "-2"
 
-  # 2) Install ProviderConfig/Secret wiring (no credentials in Git—Secret is created by TF when enabled)
+  # 2) ProviderConfig wiring (no creds in Git; Secret is created by TF when enabled)
   - name: crossplane-aws-providerconfig
     namespace: argocd
     project: default
