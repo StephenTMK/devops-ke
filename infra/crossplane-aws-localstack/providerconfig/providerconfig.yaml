@@ -4,9 +4,22 @@ metadata:
   name: default
   namespace: crossplane-system
 spec:
+  region: us-east-1
   credentials:
     source: Secret
     secretRef:
       namespace: crossplane-system
-      name: aws-creds-localstack     # created by Terraform (not committed)
-      key: creds                      # INI content
+      name: localstack-aws-secret
+      key: creds
+  # Match the LocalStack doc – drive services to a static URL
+  endpoint:
+    hostnameImmutable: true
+    services: [iam, s3, sqs, sts]
+    url:
+      type: Static
+      static: http://localstack.localstack.svc.cluster.local:4566
+  # LocalStack-friendly flags
+  s3_use_path_style: true
+  skip_credentials_validation: true
+  skip_metadata_api_check: true
+  skip_requesting_account_id: true

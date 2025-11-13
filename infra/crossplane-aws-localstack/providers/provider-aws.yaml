@@ -1,9 +1,0 @@
-apiVersion: pkg.crossplane.io/v1
-kind: Provider
-metadata:
-  name: provider-aws
-  namespace: crossplane-system
-spec:
-  package: xpkg.upbound.io/upbound/provider-aws:v1.14.0
-  controllerConfigRef:
-    name: localstack-cc
