@@ -1,0 +1,14 @@
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: provider-aws-s3
+  labels:
+    app.kubernetes.io/part-of: crossplane-providers
+spec:
+  package: xpkg.upbound.io/upbound/provider-aws-s3:v0.40.0
+  controllerConfigRef:
+    name: aws-localstack-cc
+  runtimeConfigRef:
+    apiVersion: pkg.crossplane.io/v1beta1
+    kind: DeploymentRuntimeConfig
+    name: default

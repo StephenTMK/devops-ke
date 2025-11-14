@@ -1,18 +1,22 @@
 apiVersion: pkg.crossplane.io/v1alpha1
 kind: ControllerConfig
 metadata:
-  name: localstack-cc
+  name: aws-localstack-cc
   namespace: crossplane-system
 spec:
-  args: []
+  args:
+    - --poll=2m
   env:
     - name: AWS_REGION
       value: us-east-1
-    - name: AWS_EC2_METADATA_DISABLED
-      value: "true"
-    # Point all AWS SDK clients used by the providers at LocalStack Edge
-    - name: AWS_ENDPOINT_URL
-      value: http://localstack.localstack.svc.cluster.local:4566
-  securityContext:
-    runAsUser: 65532
-    runAsGroup: 65532
+    - name: AWS_ACCESS_KEY_ID
+      valueFrom:
+        secretKeyRef:
+          name: aws-creds-localstack
+          key: access_key_id
+    - name: AWS_SECRET_ACCESS_KEY
+      valueFrom:
+        secretKeyRef:
+          name: aws-creds-localstack
+          key: secret_access_key
+  # mount CA/extra certs if you ever need to trust proxies etc.

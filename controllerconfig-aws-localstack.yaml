@@ -1,0 +1,7 @@
+apiVersion: pkg.crossplane.io/v1alpha1
+kind: ControllerConfig
+metadata:
+  name: aws-localstack-cc
+  namespace: crossplane-system
+spec:
+  serviceAccountName: provider-aws-s3

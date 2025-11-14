@@ -2,7 +2,6 @@ apiVersion: aws.upbound.io/v1beta1
 kind: ProviderConfig
 metadata:
   name: default
-  namespace: crossplane-system
 spec:
   credentials:
     source: Secret
@@ -12,12 +11,11 @@ spec:
       key: credentials
   endpoint:
     hostnameImmutable: true
-    services: [iam, s3, sqs, sts]
+    services: ["iam","s3","sqs","sts"]
     url:
       type: Static
-      # talk straight to the K8s service:
       static: http://localstack.localstack:4566
-  s3UsePathStyle: true
-  skipCredentialsValidation: true
-  skipMetadataApiCheck: true
-  skipRequestingAccountId: true
+  s3_use_path_style: true
+  skip_credentials_validation: true
+  skip_metadata_api_check: true
+  skip_requesting_account_id: true
