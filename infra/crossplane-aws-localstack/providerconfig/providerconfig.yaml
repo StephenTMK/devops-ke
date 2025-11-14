@@ -20,4 +20,3 @@ spec:
   s3UsePathStyle: true
   skipCredentialsValidation: true
   skipMetadataApiCheck: true
-  skipRequestingAccountId: true
