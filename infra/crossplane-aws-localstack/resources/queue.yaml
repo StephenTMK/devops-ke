@@ -1,0 +1,13 @@
+apiVersion: sqs.aws.upbound.io/v1beta1
+kind: Queue
+metadata:
+  name: crossplane-test-queue
+  labels:
+    argocd.argoproj.io/instance: crossplane-aws-localstack
+spec:
+  forProvider:
+    name: crossplane-test-queue
+    region: us-east-1
+  providerConfigRef:
+    name: default
+  deletionPolicy: Delete

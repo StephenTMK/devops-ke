@@ -1,0 +1,14 @@
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: provider-aws-sqs
+  labels:
+    argocd.argoproj.io/instance: crossplane-providers
+spec:
+  package: xpkg.upbound.io/upbound/provider-aws-sqs:v0.40.0
+  controllerConfigRef:
+    name: aws-localstack-cc
+  runtimeConfigRef:
+    apiVersion: pkg.crossplane.io/v1beta1
+    kind: DeploymentRuntimeConfig
+    name: default
