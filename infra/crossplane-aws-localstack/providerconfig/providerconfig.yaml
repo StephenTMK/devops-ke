@@ -8,7 +8,7 @@ spec:
     secretRef:
       name: aws-creds-localstack
       namespace: crossplane-system
-      key: creds
+      key: credentials
   endpoint:
     hostnameImmutable: true
     services: ["iam","s3","sqs","sts"]
