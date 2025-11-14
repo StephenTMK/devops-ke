@@ -1,36 +1,34 @@
 ---
-# Controller config: make provider controllers talk to LocalStack
 apiVersion: pkg.crossplane.io/v1alpha1
 kind: ControllerConfig
 metadata:
   name: aws-localstack-cc
   namespace: crossplane-system
 spec:
+  # Make the controller talk to LocalStack with explicit creds and no IMDS
   env:
     - name: AWS_REGION
       value: us-east-1
+    - name: AWS_EC2_METADATA_DISABLED
+      value: "true"
+    - name: AWS_ACCESS_KEY_ID
+      value: test
+    - name: AWS_SECRET_ACCESS_KEY
+      value: test
+    # Keep for tools/libraries that honor a global endpoint
     - name: AWS_ENDPOINT_URL
       value: http://localstack.localstack.svc.cluster.local:4566
+    # S3 path-style is required with LocalStack
     - name: AWS_S3_USE_PATH_STYLE
       value: "true"
 ---
-# Family provider – shared types/infra for AWS
-apiVersion: pkg.crossplane.io/v1
-kind: Provider
-metadata:
-  name: upbound-provider-family-aws
-  namespace: crossplane-system
-spec:
-  package: xpkg.upbound.io/upbound/provider-family-aws:v0.40.0
-  controllerConfigRef:
-    name: aws-localstack-cc
----
-# S3 provider – installs s3.aws.upbound.io CRDs/controllers
 apiVersion: pkg.crossplane.io/v1
 kind: Provider
 metadata:
   name: provider-aws-s3
   namespace: crossplane-system
+  labels:
+    app.kubernetes.io/part-of: crossplane-providers
 spec:
   package: xpkg.upbound.io/upbound/provider-aws-s3:v0.40.0
   controllerConfigRef:
