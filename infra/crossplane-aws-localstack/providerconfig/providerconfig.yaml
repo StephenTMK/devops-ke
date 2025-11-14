@@ -18,5 +18,4 @@ spec:
       # talk straight to the K8s service:
       static: http://localstack.localstack:4566
   s3UsePathStyle: true
-  skipCredentialsValidation: true
   skipMetadataApiCheck: true
