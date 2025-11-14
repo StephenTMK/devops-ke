@@ -5,8 +5,7 @@ metadata:
   labels:
     argocd.argoproj.io/instance: crossplane-providers
 spec:
-  # Match your family version if you want, e.g. v2.2.0; or keep v0.40.0 like S3.
-  package: xpkg.upbound.io/upbound/provider-aws-sqs:v2.2.0
+  package: xpkg.upbound.io/upbound/provider-aws-sqs:v0.40.0
   controllerConfigRef:
     name: aws-localstack-cc
   runtimeConfigRef:
