@@ -17,4 +17,3 @@ spec:
       type: Static
       # talk straight to the K8s service:
       static: http://localstack.localstack:4566
-  skipMetadataApiCheck: true
