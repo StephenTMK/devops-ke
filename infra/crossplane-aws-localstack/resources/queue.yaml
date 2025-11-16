@@ -2,8 +2,7 @@ apiVersion: sqs.aws.upbound.io/v1beta1
 kind: Queue
 metadata:
   name: crossplane-test-queue
-  labels:
-    argocd.argoproj.io/instance: crossplane-aws-localstack
+  namespace: crossplane-system
 spec:
   forProvider:
     name: crossplane-test-queue

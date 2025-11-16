@@ -4,5 +4,3 @@ resources:
   - controllerconfig-localstack.yaml
   - provider-aws-s3.yaml
   - provider-aws-sqs.yaml
-# NOTE:
-# Do NOT include a provider-family YAML here, or it will clash with the individual providers.

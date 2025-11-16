@@ -11,7 +11,11 @@ spec:
       key: credentials
   endpoint:
     hostnameImmutable: true
-    services: ["iam","s3","sqs","sts"]
+    services:
+      - iam
+      - s3
+      - sqs
+      - sts
     url:
       type: Static
       static: http://localstack.localstack:4566

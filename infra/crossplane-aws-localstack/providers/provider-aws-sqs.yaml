@@ -3,7 +3,7 @@ kind: Provider
 metadata:
   name: provider-aws-sqs
   labels:
-    argocd.argoproj.io/instance: crossplane-providers
+    app.kubernetes.io/part-of: crossplane-providers
 spec:
   package: xpkg.upbound.io/upbound/provider-aws-sqs:v0.40.0
   controllerConfigRef:

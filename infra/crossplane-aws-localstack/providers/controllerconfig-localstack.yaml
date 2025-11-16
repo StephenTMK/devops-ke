@@ -4,10 +4,10 @@ metadata:
   name: aws-localstack-cc
   namespace: crossplane-system
 spec:
-  # The provider pods run in crossplane-system, so the Secret must live here (it does).
   env:
     - name: AWS_REGION
       value: us-east-1
+    # Make provider pods read creds from a single Secret with these two keys:
     - name: AWS_ACCESS_KEY_ID
       valueFrom:
         secretKeyRef:
