@@ -4,8 +4,7 @@ metadata:
   name: aws-localstack-cc
   namespace: crossplane-system
 spec:
-  args:
-    - --poll=2m
+  # The provider pods run in crossplane-system, so the Secret must live here (it does).
   env:
     - name: AWS_REGION
       value: us-east-1
@@ -19,4 +18,3 @@ spec:
         secretKeyRef:
           name: aws-creds-localstack
           key: secret_access_key
-  # mount CA/extra certs if you ever need to trust proxies etc.
